@@ -11,7 +11,7 @@ export const createHelpCommand = (commandRegistry: CommandRegistry): Command => 
       .map((command) => (() => {
         const name = command.name;
         const description = command.description;
-        const permissionRequired = command.permissionRequired ? ` (Permission required: ${command.permissionRequired})` : "";
+        const permissionRequired = command.permissionRequired ? ` (Permission required: **${command.permissionRequired}**)` : "";
         return `- \`/${name}\`: ${description}${permissionRequired}`;
       })())
       .join("\n");
