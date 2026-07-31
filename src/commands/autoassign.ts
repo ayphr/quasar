@@ -16,6 +16,16 @@ export const autoassignCommand: Command = {
     const randomIndex = Math.floor(Math.random() * teamMembers.length);
     const selectedAssignee = teamMembers[randomIndex];
 
+    const existingAssignees = context.payload.issue.assignees.map((a) => a?.login).filter((v): v is string => !!v);
+    if (existingAssignees.length > 0) {
+      await context.octokit.rest.issues.removeAssignees({
+        owner: context.payload.repository.owner.login,
+        repo: context.payload.repository.name,
+        issue_number: context.payload.issue.number,
+        assignees: existingAssignees,
+      });
+    }
+
     await context.octokit.rest.issues.addAssignees({
       owner: context.payload.repository.owner.login,
       repo: context.payload.repository.name,
