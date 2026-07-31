@@ -3,6 +3,7 @@ import { pingCommand } from "./ping";
 import { triageCommand } from "./triage";
 import { invalidCommand } from "./invalid";
 import { awaitingCommand } from "./awaiting";
+import { autoassignCommand } from "./autoassign";
 import { createHelpCommand } from "./help";
 
 export class CommandRegistry {
@@ -13,6 +14,7 @@ export class CommandRegistry {
     this.register(triageCommand);
     this.register(invalidCommand);
     this.register(awaitingCommand);
+    this.register(autoassignCommand);
 
     this.register(createHelpCommand(this));
   }
