@@ -8,7 +8,12 @@ export const createHelpCommand = (commandRegistry: CommandRegistry): Command => 
     const commands = commandRegistry.getCommands();
 
     const helpMessage = commands
-      .map((command) => `- **${command.name}**: ${command.description}`)
+      .map((command) => (() => {
+        const name = command.name;
+        const description = command.description;
+        const permissionRequired = command.permissionRequired ? ` (Permission required: ${command.permissionRequired})` : "";
+        return `- \`${name}\`: ${description}${permissionRequired}`;
+      })())
       .join("\n");
 
     const helpComment = context.issue({ body: `Available commands:\n\n${helpMessage}` });
