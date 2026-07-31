@@ -1,27 +1,15 @@
 import { Command, CommandContext } from "./types";
 
-export const triageCommand: Command = {
-  name: "triage",
-  description: "Triage an issue",
+export const invalidCommand: Command = {
+  name: "invalid",
+  description: "Mark an issue as invalid",
   permissionRequired: "maintainer",
-  execute: async ({ context, args }: CommandContext) => {
-    const labels = args.length > 0 ? args : [];
-
-    if (context.payload.issue.type?.name === "bug" && !labels.includes("confirmed")) {
-      labels.push("confirmed");
-    }
-
-    if (labels.length === 0) {
-      const errorComment = context.issue({ body: "Please provide labels to triage the issue." });
-      await context.octokit.rest.issues.createComment(errorComment);
-      return;
-    }
-
+  execute: async ({ context }: CommandContext) => {
     await context.octokit.rest.issues.addLabels({
       owner: context.payload.repository.owner.login,
       repo: context.payload.repository.name,
       issue_number: context.payload.issue.number,
-      labels: labels,
+      labels: ["invalid"],
     });
 
     const existingLabels = context.payload.issue.labels.map((l) => l.name);
@@ -34,7 +22,7 @@ export const triageCommand: Command = {
       });
     }
 
-    const successComment = context.issue({ body: `Issue triaged with labels: ${labels.join(", ")}` });
+    const successComment = context.issue({ body: "Issue marked as invalid." });
     await context.octokit.rest.issues.createComment(successComment);
   },
 };

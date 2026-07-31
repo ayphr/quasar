@@ -8,5 +8,6 @@ export interface CommandContext {
 export interface Command {
   name: string;
   description: string;
+  permissionRequired?: "maintainer" | "anyone";
   execute: (cmdContext: CommandContext) => Promise<void>;
 }
