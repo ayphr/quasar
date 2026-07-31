@@ -33,7 +33,7 @@ export const autoassignCommand: Command = {
       assignees: [selectedAssignee.login],
     });
 
-    const successComment = context.issue({ body: `Issue auto-assigned to @${selectedAssignee.login}.` });
+    const successComment = context.issue({ body: `Issue auto-assigned to @${selectedAssignee.login} (from a pool of ${teamMembers.length}).` });
     await context.octokit.rest.issues.createComment(successComment);
   },
 };
