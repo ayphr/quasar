@@ -11,7 +11,6 @@ export const pingCommand: Command = {
       content: "+1",
     });
 
-    // Create reply comment
     const pingComment = context.issue({ body: "Pong!" });
     await context.octokit.rest.issues.createComment(pingComment);
   },
