@@ -11,7 +11,8 @@
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --clean",
-    "start": "npm run build && probot run ./dist/index.js"
+    "start": "probot run ./dist/index.js",
+    "dev": "npm run build && npm run start"
   },
   "dependencies": {
     "probot": "^14.3.2"
