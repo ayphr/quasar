@@ -13,9 +13,6 @@ export const autoassignCommand: Command = {
       }
     );
 
-    const randomIndex = Math.floor(Math.random() * teamMembers.length);
-    const selectedAssignee = teamMembers[randomIndex];
-
     const existingAssignees = context.payload.issue.assignees.map((a) => a?.login).filter((v): v is string => !!v);
     if (existingAssignees.length > 0) {
       await context.octokit.rest.issues.removeAssignees({
@@ -25,6 +22,17 @@ export const autoassignCommand: Command = {
         assignees: existingAssignees,
       });
     }
+
+    const availableMembers = teamMembers.filter((member) => !existingAssignees.includes(member.login));
+
+    if (availableMembers.length === 0) {
+      const noAvailableComment = context.issue({ body: "No available team members to assign." });
+      await context.octokit.rest.issues.createComment(noAvailableComment);
+      return;
+    }
+
+    const randomIndex = Math.floor(Math.random() * teamMembers.length);
+    const selectedAssignee = teamMembers[randomIndex];
 
     await context.octokit.rest.issues.addAssignees({
       owner: context.payload.repository.owner.login,
