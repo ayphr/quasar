@@ -36,7 +36,12 @@ export class CommandRegistry {
         username: cmdContext.context.payload.comment.user?.login || "",
       });
 
-      if (permission.permission !== "admin" && permission.permission !== "write") {
+      const { data: membership } = await cmdContext.context.octokit.rest.orgs.getMembershipForUser({
+        org: cmdContext.context.payload.repository.owner.login,
+        username: cmdContext.context.payload.comment.user?.login || "",
+      });
+
+      if (permission.permission !== "admin" && permission.permission !== "write" && membership.state !== "active") {
         const errorComment = cmdContext.context.issue({ body: "You do not have permission to execute this command." });
         await cmdContext.context.octokit.rest.issues.createComment(errorComment);
         return true;
