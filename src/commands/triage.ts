@@ -5,7 +5,8 @@ export const triageCommand: Command = {
   description: "Triage an issue",
   permissionRequired: "maintainer",
   execute: async ({ context, args }: CommandContext) => {
-    const labels = args.length > 0 ? args : [];
+    const labelsInput = args.join(" ").trim();
+    const labels = labelsInput.length > 0 ? labelsInput.split(",").map((label) => label.trim()).filter(Boolean) : [];
 
     if (context.payload.issue.type?.name === "bug" && !labels.includes("confirmed")) {
       labels.push("confirmed");
