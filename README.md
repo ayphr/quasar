@@ -28,4 +28,4 @@ For more, check out the [Contributing Guide](CONTRIBUTING.md).
 
 ## License
 
-[ISC](LICENSE) © 2026 Ayphr
+[Apache 2.0](LICENSE) © 2026 Ayphr
