@@ -1,18 +1,22 @@
 import { Probot } from "probot";
 import { EventHandler } from "./types";
+import { processIssue } from "../services/issueService";
 
 export const issueHandler: EventHandler = {
   register: (app: Probot) => {
-    app.on("issues.opened", async (context) => {
-      const labels = context.payload.issue.labels?.map((label) => label.name);
+    app.on(
+      ["issues.opened", "issues.reopened", "issues.edited"],
+      async (context) => {
+        const owner = context.payload.repository.owner.login;
+        const repo = context.payload.repository.name;
+        const issueNumber = context.payload.issue.number;
 
-      if (labels?.includes("triage needed")) {
-        const issueComment = context.issue({
-          body: "Thanks for opening this issue! A maintainer will triage it as soon as possible.",
-        });
-
-        await context.octokit.rest.issues.createComment(issueComment);
+        try {
+          await processIssue(context.octokit, owner, repo, issueNumber);
+        } catch (error) {
+          context.log.error({ err: error }, `Failed to process issue #${issueNumber}`);
+        }
       }
-    });
+    );
   },
 };

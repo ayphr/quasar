@@ -15,6 +15,7 @@
     "dev": "npm run build && npm run start"
   },
   "dependencies": {
+    "node-cron": "^4.6.0",
     "probot": "^14.3.2"
   },
   "devDependencies": {
