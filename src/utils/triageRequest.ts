@@ -15,16 +15,17 @@ export async function requestAuthorTriage(
   }
 
   const labelList = authorLabels.map((l) => `- \`${l}\``).join("\n");
-  const issueTypeText = issueType === "issue" ? "issue" : "pull request";
 
   const body = `
-Hi @${authorLogin}! Thanks for opening this ${issueTypeText}.
+Hi @${authorLogin}! Thanks for opening this ${issueType}.
 
-Before we can proceed, please add appropriate labels from the following list using the \`/label\` command:
+Before we can proceed, please add appropriate labels from the following list:
 
 ${labelList}
 
-These help us categorize and route your ${issueTypeText}. You can add multiple labels.
+These help us categorize and route your ${issueType}. You can add multiple labels.
+
+Note: Status labels like \`invalid\`, \`awaiting author\`, \`confirmed\`, \`stale\`, and \`merge conflict\` are managed automatically by the bot.
 `;
 
   await octokit.rest.issues.createComment({
@@ -39,7 +40,24 @@ export function isBodyWellFormed(body: string | null | undefined): boolean {
   return (body ?? "").length >= 20;
 }
 
-export function isBugReportWellFormed(text = ""): boolean {
+const BUG_REPORT_KEYWORDS = [
+  "reproduc",
+  "steps to reproduce",
+  "expected behavior",
+  "actual behavior",
+  "what happened",
+  "what did",
+  "reproduce steps",
+];
+
+export function isBugReportWellFormed(
+  body: string | null | undefined,
+  issueType?: string | null
+): boolean {
+  const text = body ?? "";
+  if (text.length < 20) return false;
   const lower = text.toLowerCase();
-  return text.length >= 50 && lower.includes("reproduc");
+  const hasBugKeyword = BUG_REPORT_KEYWORDS.some((kw) => lower.includes(kw));
+  const isBugType = issueType?.toLowerCase().includes("bug");
+  return hasBugKeyword || isBugType === true;
 }

@@ -4,6 +4,8 @@ import { addLabel, removeLabel, getLabelNames } from "../utils/labelManager";
 import { requestAuthorTriage, isBodyWellFormed, isBugReportWellFormed } from "../utils/triageRequest";
 import { isIssueEligibleForClose, isIssueEligibleForWarning } from "../utils/staleChecker";
 
+type IssueWithType = { type?: { name?: string } | null };
+
 export async function processIssue(
   octokit: ProbotOctokit,
   owner: string,
@@ -29,6 +31,7 @@ export async function processIssue(
 
   const body = issue.body ?? "";
   const authorLogin = issue.user?.login ?? "unknown";
+  const issueType = (issue as unknown as IssueWithType).type?.name;
 
   if (!isBodyWellFormed(body)) {
     if (!labelSet.has("invalid")) {
@@ -49,7 +52,7 @@ export async function processIssue(
     await removeLabel(octokit, ownerRepo, issueNumber, "invalid");
   }
 
-  if (isBugReportWellFormed(body)) {
+  if (isBugReportWellFormed(body, issueType)) {
     if (!labelSet.has("confirmed")) {
       await addLabel(octokit, ownerRepo, issueNumber, "confirmed");
       await octokit.rest.issues.createComment({
@@ -60,7 +63,7 @@ export async function processIssue(
       });
     }
     await removeLabel(octokit, ownerRepo, issueNumber, "awaiting author");
-  } else if (!isBugReportWellFormed(body) && body.length < 50) {
+  } else if (!isBugReportWellFormed(body, issueType) && body.length < 50) {
     if (!labelSet.has("awaiting author")) {
       await addLabel(octokit, ownerRepo, issueNumber, "awaiting author");
       await octokit.rest.issues.createComment({
@@ -71,6 +74,7 @@ export async function processIssue(
       });
     }
     await removeLabel(octokit, ownerRepo, issueNumber, "confirmed");
+    return;
   } else {
     if (labelSet.has("awaiting author")) {
       await removeLabel(octokit, ownerRepo, issueNumber, "awaiting author");
@@ -78,6 +82,23 @@ export async function processIssue(
     if (labelSet.has("confirmed")) {
       await removeLabel(octokit, ownerRepo, issueNumber, "confirmed");
     }
+  }
+
+  const contentLabels = labelNames.filter(
+    (l) => !CONFIG.BOT_MANAGED_LABELS.includes(l as (typeof CONFIG)["BOT_MANAGED_LABELS"][number])
+  );
+
+  if (contentLabels.length > 0) {
+    if (labelSet.has("awaiting author")) {
+      await removeLabel(octokit, ownerRepo, issueNumber, "awaiting author");
+      await octokit.rest.issues.createComment({
+        owner,
+        repo,
+        issue_number: issueNumber,
+        body: `Thanks for adding labels, @${authorLogin}! This issue is now properly categorized.`,
+      });
+    }
+    return;
   }
 
   await requestAuthorTriage(

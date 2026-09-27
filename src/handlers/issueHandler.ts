@@ -5,8 +5,10 @@ import { processIssue } from "../services/issueService";
 export const issueHandler: EventHandler = {
   register: (app: Probot) => {
     app.on(
-      ["issues.opened", "issues.reopened", "issues.edited"],
+      ["issues.opened", "issues.reopened", "issues.edited", "issues.labeled"],
       async (context) => {
+        if (context.isBot) return;
+
         const owner = context.payload.repository.owner.login;
         const repo = context.payload.repository.name;
         const issueNumber = context.payload.issue.number;
