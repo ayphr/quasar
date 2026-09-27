@@ -1,19 +1,22 @@
 import { Command, CommandContext } from "./types";
 import { pingCommand } from "./ping";
+import { triageCommand } from "./triage";
+import { invalidCommand } from "./invalid";
+import { awaitingCommand } from "./awaiting";
+import { autoassignCommand } from "./autoassign";
 import { createHelpCommand } from "./help";
-import { labelCommand } from "./label";
-import { unlabelCommand } from "./unlabel";
-import { readyCommand } from "./ready";
 
 export class CommandRegistry {
   private readonly commands: Map<string, Command> = new Map();
 
   constructor() {
     this.register(pingCommand);
+    this.register(triageCommand);
+    this.register(invalidCommand);
+    this.register(awaitingCommand);
+    this.register(autoassignCommand);
+
     this.register(createHelpCommand(this));
-    this.register(labelCommand);
-    this.register(unlabelCommand);
-    this.register(readyCommand);
   }
 
   public register(command: Command) {

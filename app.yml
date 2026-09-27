@@ -22,20 +22,20 @@ default_events:
   # - deployment_status
   # - fork
   # - gollum
-  - issue_comment
+  # - issue_comment
   - issues
-  # - label
-  # - milestone
-  # - member
-  # - membership
-  # - org_block
-  # - organization
-  # - page_build
-  # - project
-  # - project_card
-  # - project_column
-  # - public
-  - pull_request
+# - label
+# - milestone
+# - member
+# - membership
+# - org_block
+# - organization
+# - page_build
+# - project
+# - project_card
+# - project_column
+# - public
+# - pull_request
 # - pull_request_review
 # - pull_request_review_comment
 # - push
@@ -134,4 +134,4 @@ default_permissions:
 
 # Set to true when your GitHub App is available to the public or false when it is only accessible to the owner of the app.
 # Default: true
-public: false
+# public: false
